@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS employee_db;
-CREATE DATABASE employee_db_db;
+CREATE DATABASE employee_db;
 
 USE employee_db;
 
@@ -26,7 +26,12 @@ CREATE TABLE employee (
     manager_id INT,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE manager (   
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     FOREIGN KEY (manager_id)
     REFERENCES employee(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE 
 );
