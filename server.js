@@ -1,5 +1,4 @@
 const express = require('express');
-const routes = require('./routes');
 // Import and require mysql2
 const mysql = require('mysql2');
 
@@ -23,8 +22,39 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_db database.`)
 );
 
-// turn on routes
-app.use(routes);
+// Define your list of choices
+const choices = [
+  "View All Employees",
+  "Add Employee",
+  "Update Employee Role",
+  "View All Roles",
+  "Add Role",
+  "View All Departments",
+  "Add Department",
+];
+
+// Prompt the user to select an item
+inquirer.prompt([
+  {
+    type: 'list',
+    name: 'selection',
+    message: 'What would you like to do?',
+    choices: choices,
+  }, 
+])
+.then((answers) => {
+  const selected = answers.selection;
+  console.log(`You selected: ${selected}`);
+  if (selected === 'View All Employees') {
+    db.query('SELECT * FROM course_names', function (err, results) {
+      console.log(results);
+    });
+  }
+  // You can perform actions based on the selected item here
+})
+.catch((error) => {
+  console.error(error);
+});
 
 app.use((req, res) => {
   res.status(404).end();
