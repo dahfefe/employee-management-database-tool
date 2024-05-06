@@ -62,36 +62,64 @@ inquirer.prompt([
       console.table(results);
     });
   }
-  
-  /*
-  if (selected === 'Add Employee') {
+  if (selected === 'Add Department') {
     inquirer.prompt([
       {
         type: 'input',
-        name: 'first_name',
-        message: 'What is the employee',
+        name: 'department',
+        message: 'What is the name of the department?',
+      }
+    ])
+
+      .then((data) => {
+        db.query('INSERT INTO department (department_name) VALUES (?)', data.department, function (err, results){
+          db.query(`SELECT * from department`, function (err, results){
+            console.table(results);
+          })
+        })
+      })
+  }
+  if (selected === 'Add Role') {
+
+    app.get('/api/departments', (req, res) => {
+      const sql = `SELECT department_name from department`; 
+      db.query(sql, (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).send('Error fetching data');
+        } else {
+          const values = results.map(row => row.column_name); // Extract column values
+          res.json(values); // Send data as JSON
+        }
+      });
+    });
+
+    inquirer.prompt([
+      {
+        type: 'input',
+        name: 'title',
+        message: 'What is the name of the role?',
       },
       {
         type: 'input',
-        name: 'last_name',
-        message: 'What is the employee',
-      },
-      {
-        type: 'input',
-        name: 'role_title',
-        message: 'What is the employee',
+        name: 'salary',
+        message: 'What is the name of the role?',
       },
       {
         type: 'list',
-        name: 'manager_name',
-        message: 'What is the employee',
-      },
+        name: 'selection',
+        message: 'Which department does the role belong to?',
+        choices: values,
+      }
     ])
-    .then((data) => {
-      db.query('INSERT INTO employee,(first_name, last_name, role_id, manager_id')  
+
+      .then((data) => {
+        db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.title, data.salary, data.selection], function (err, results){
+          console.log(results);
+        })
     })
   }
-  */
+  
 })
 
 .catch((error) => {
