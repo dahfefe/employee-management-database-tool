@@ -48,7 +48,17 @@ inquirer.prompt([
   const selected = answers.selection;
   console.log(`You selected: ${selected}`);
   if (selected === 'View All Employees') {
-    db.query('SELECT * from employee', function (err, results) {
+    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id;', function (err, results) {
+      console.table(results);
+    });
+  }
+  if (selected === 'View All Roles') {
+    db.query('SELECT role.id, role.title AS Title, department.department_name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id;', function (err, results) {
+      console.table(results);
+    });
+  }
+  if (selected === 'View All Departments') {
+    db.query('SELECT department.id, department.department_name AS Department FROM department;', function (err, results) {
       console.table(results);
     });
   }
