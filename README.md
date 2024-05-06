@@ -38,7 +38,10 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 
 ## Features
   
-Dependency: [Express 4.17.1](https://www.npmjs.com/package/express), [MySQL2 2.1.0](https://www.npmjs.com/package/mysql2), [Inquirer](https://www.npmjs.com/package/inquirer)
+Dependency: 
+- [Express 4.17.1](https://www.npmjs.com/package/express)
+- [MySQL2 2.1.0](https://www.npmjs.com/package/mysql2)
+- [Inquirer 8.2.4](https://www.npmjs.com/package/inquirer)
 
 ## Contributing
 

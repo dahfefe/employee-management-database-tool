@@ -26,12 +26,19 @@ const db = mysql.createConnection(
 // Define your list of choices
 const choices = [
   "View All Employees",
+  "View Employees by Manager",
+  "View Employees by Department",
   "Add Employee",
+  "Change Status of Employee as Manager",
   "Update Employee Role",
   "View All Roles",
   "Add Role",
   "View All Departments",
   "Add Department",
+  "Delete Employee",
+  "Delete Role",
+  "Delete Department",
+  "View Total Budget by Department",
 ];
 
 // Prompt the user to select an item
