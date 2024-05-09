@@ -74,26 +74,11 @@ inquirer.prompt([
     });
   }
   if (selected === 'Add Department') {
-    // addDepartment()
-    inquirer.prompt([
-      {
-        type: 'input',
-        name: 'department',
-        message: 'What is the name of the department?',
-      }
-    ])
-
-      .then((data) => {
-        db.query('INSERT INTO department (department_name) VALUES (?)', data.department, function (err, results){
-          db.query(`SELECT * from department`, function (err, results){
-            console.table(results);
-          })
-        })
-      })
+    addDepartment()
   }
-  
+
   if (selected === 'Add Role') {
-    addRoles()
+    addRole()
   }
 
 })
@@ -102,7 +87,28 @@ inquirer.prompt([
   console.error(error);
 });
 
-async function addRoles(){
+function addDepartment(){
+  const answers = [
+    {
+      type: 'input',
+      name: 'department',
+      message: 'What is the name of the department?',
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    db.query('INSERT INTO department (department_name) VALUES (?)', [data.department], function (err, results){
+        // console.table(results);
+      });
+      console.log(`Added ${data.department} to the database`);
+    })
+  .catch(err => console.error(err));
+};
+
+// function to allow call that allows users to add role position to database
+async function addRole(){
   const answers = [
     {
       type: 'input',
@@ -122,7 +128,6 @@ async function addRoles(){
     }
   ];
 
-
   inquirer.prompt(answers)
   .then((data) => {
     console.log(data);
@@ -134,7 +139,7 @@ async function addRoles(){
   .catch(err => console.error(err));
 };
 
-
+// function that enables dynamic choice selection when adding a role position to a department
 function getDepartmentChoices() {
   return new Promise((resolve, reject) => {
     db.query('SELECT id AS value, department_name FROM department',function(err,data){
