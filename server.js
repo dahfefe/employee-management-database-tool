@@ -39,6 +39,7 @@ const choices = [
   "Delete Role",
   "Delete Department",
   "View Total Budget by Department",
+  "Quit",
 ];
 
 // Prompt the user to select an item
@@ -54,6 +55,9 @@ inquirer.prompt([
 .then((answers) => {
   const selected = answers.selection;
   console.log(`You selected: ${selected}`);
+  if (selected === 'Quit') {
+    return;
+  };
   if (selected === 'View All Employees') {
     db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id;', function (err, results) {
       console.table(results);
@@ -70,6 +74,7 @@ inquirer.prompt([
     });
   }
   if (selected === 'Add Department') {
+    // addDepartment()
     inquirer.prompt([
       {
         type: 'input',
@@ -86,52 +91,59 @@ inquirer.prompt([
         })
       })
   }
-  if (selected === 'Add Role') {
-
-    app.get('/api/departments', (req, res) => {
-      const sql = `SELECT department_name from department`; 
-      db.query(sql, (error, results) => {
-        if (error) {
-          console.error(error);
-          res.status(500).send('Error fetching data');
-        } else {
-          const values = results.map(row => row.column_name); // Extract column values
-          res.json(values); // Send data as JSON
-        }
-      });
-    });
-
-    inquirer.prompt([
-      {
-        type: 'input',
-        name: 'title',
-        message: 'What is the name of the role?',
-      },
-      {
-        type: 'input',
-        name: 'salary',
-        message: 'What is the name of the role?',
-      },
-      {
-        type: 'list',
-        name: 'selection',
-        message: 'Which department does the role belong to?',
-        choices: values,
-      }
-    ])
-
-      .then((data) => {
-        db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.title, data.salary, data.selection], function (err, results){
-          console.log(results);
-        })
-    })
-  }
   
+  if (selected === 'Add Role') {
+    addRoles()
+  }
+
 })
 
 .catch((error) => {
   console.error(error);
 });
+
+async function addRoles(){
+  const answers = [
+    {
+      type: 'input',
+      name: 'title',
+      message: 'What is the name of the role?',
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: 'What is the salary of the role?',
+    },
+    {
+      type: 'list',
+      name: 'selectedDepartment',
+      message: 'Which department does the role belong to?',
+      choices: await getDepartmentChoices(),
+    }
+  ];
+
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    console.log(data);
+    db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.title, data.salary, data.selectedDepartment], function (err, results){
+      console.log(results);
+    });
+    console.log(`Added ${data.title} to the database`);
+  })
+  .catch(err => console.error(err));
+};
+
+
+function getDepartmentChoices() {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id AS value, department_name FROM department',function(err,data){
+      if(err) console.log(err)
+      console.log(data);
+      resolve(data.map(row => ({ value: row.value, name: row.department_name })));
+    })
+  });
+}
 
 app.use((req, res) => {
   res.status(404).end();
