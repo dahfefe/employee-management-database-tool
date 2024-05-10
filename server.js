@@ -63,6 +63,10 @@ inquirer.prompt([
     viewEmployeesByManager()
   };
 
+  if (selected === 'View Employees by Department') {
+    viewEmployeesByDepartment()
+  };
+
   if (selected === 'View All Employees') {
     db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id;', function (err, results) {
       console.table(results);
@@ -97,7 +101,7 @@ inquirer.prompt([
 
 
 // function to allow call that allows users to view employees based on manager
-async function viewEmployeesByManager(){
+function viewEmployeesByManager(){
   const answers = [
     {
       type: 'input',
@@ -109,7 +113,7 @@ async function viewEmployeesByManager(){
   inquirer.prompt(answers)
   .then((data) => {
     // console.log(data, 'line #111');  //* { managerName: 'Jack' } 
-    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, manager.first_name AS manager FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE manager.first_name = ?;', [data.managerName], function (err, results){
+    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, manager.first_name AS Manager FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE manager.first_name = ?;', [data.managerName], function (err, results){
       console.table(results);
     });
     console.log(`You are viewing employees under manager, ${data.managerName}`);
@@ -117,6 +121,26 @@ async function viewEmployeesByManager(){
   .catch(err => console.error(err));
 };
 
+// function to allow call that allows users to view employees based on manager
+function viewEmployeesByDepartment(){
+  const answers = [
+    {
+      type: 'input',
+      name: 'departmentName',
+      message: 'What is the name of the department?',
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data, 'line #111');  //* { departmentName: 'Legal' } 
+    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, manager.first_name AS Manager FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE department.department_name = ?;', [data.departmentName], function (err, results){
+      console.table(results);
+    });
+    console.log(`You are viewing employees under department, ${data.departmentName}`);
+  })
+  .catch(err => console.error(err));
+};
 
 function addDepartment(){
   const answers = [
