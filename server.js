@@ -105,6 +105,10 @@ inquirer.prompt([
     updateEmployeeManager()
   };
 
+  if (selected === 'Delete Employee') {
+    deleteEmployee()
+  };
+
 })
 
 .catch((error) => {
@@ -269,6 +273,7 @@ async function updateEmployeeRole(){
   inquirer.prompt(answers)
   .then((data) => {
     console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
     db.query(`UPDATE employee SET role_id = ${data.role} WHERE id = ${data.employee};`, function (err, results){});
     console.log(`Updated employee role in the database`);
   })
@@ -296,8 +301,31 @@ async function updateEmployeeManager(){
   inquirer.prompt(answers)
   .then((data) => {
     // console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
     db.query(`UPDATE employee SET manager_id = ${data.manager} WHERE id = ${data.employee};`, function (err, results){});
     console.log(`Updated manager of employee in the database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function to allow users to delete employees in database
+async function deleteEmployee(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'employee',
+      message: 'Which employee is being removed?',
+      choices: await getListOfEmployees(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
+    db.query(`DELETE from employee WHERE id = ${data.employee};`, function (err, results){});
+    console.log(`Deleted employee from database`);
   })
   .catch(err => console.error(err));
 };
