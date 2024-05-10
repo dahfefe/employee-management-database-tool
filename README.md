@@ -14,7 +14,7 @@ This project includes backend technology for an interface that allows users to e
 
 GitHub repo link: https://github.com/dahfefe/employee-management-database-tool
 
-Video Link for How to Use: 
+Video Link for How to Use: https://watch.screencastify.com/v/MSS6w65QwOA4l1TLaq0f
 
 ## What I Learned
   
