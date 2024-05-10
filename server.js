@@ -109,6 +109,14 @@ inquirer.prompt([
     deleteEmployee()
   };
 
+  if (selected === 'Delete Role') {
+    deleteRole()
+  };
+
+  if (selected === 'Delete Department') {
+    deleteDepartment()
+  };
+
 })
 
 .catch((error) => {
@@ -326,6 +334,50 @@ async function deleteEmployee(){
     //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
     db.query(`DELETE from employee WHERE id = ${data.employee};`, function (err, results){});
     console.log(`Deleted employee from database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function to allow users to delete roles in database
+async function deleteRole(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'role',
+      message: 'Which role is being removed?',
+      choices: await getListOfRoles(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
+    db.query(`DELETE from role WHERE id = ${data.role};`, function (err, results){});
+    console.log(`Deleted role from database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function to allow users to delete departments in database
+async function deleteDepartment(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'department',
+      message: 'Which department is being removed?',
+      choices: await getDepartmentChoices(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
+    db.query(`DELETE from department WHERE id = ${data.department};`, function (err, results){});
+    console.log(`Deleted department from database`);
   })
   .catch(err => console.error(err));
 };
