@@ -117,6 +117,10 @@ inquirer.prompt([
     deleteDepartment()
   };
 
+  if (selected === 'View Total Budget by Department') {
+    combinedBudgetByDepartment()
+  };
+
 })
 
 .catch((error) => {
@@ -378,6 +382,28 @@ async function deleteDepartment(){
     //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
     db.query(`DELETE from department WHERE id = ${data.department};`, function (err, results){});
     console.log(`Deleted department from database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function to allow users to find the combined budget by department
+async function combinedBudgetByDepartment(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'department',
+      message: 'Which department do you want to find the combined budget?',
+      choices: await getDepartmentChoices(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    console.log(data);
+    //! literals only hold a number value when deriving from a list inquirer > cannot render text / string
+    db.query(`SELECT department.department_name AS Department, SUM(role.salary) AS Total_Budget FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id WHERE role.department_id = ${data.department};`, function (err, results){console.table(results);});
+    console.log(`This is the combined budget of the department.`);
   })
   .catch(err => console.error(err));
 };
