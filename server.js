@@ -68,7 +68,7 @@ inquirer.prompt([
   };
 
   if (selected === 'View All Employees') {
-    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id;', function (err, results) {
+    db.query('SELECT role.id, employee.first_name AS First_Name, employee.last_name AS Last_Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, manager.first_name AS manager FROM role JOIN department ON role.department_id = department.id JOIN employee ON employee.role_id = role.id LEFT JOIN employee manager ON employee.manager_id = manager.id;', function (err, results) {
       console.table(results);
     });
   };
@@ -91,6 +91,10 @@ inquirer.prompt([
 
   if (selected === 'Add Role') {
     addRole()
+  };
+
+  if (selected === 'Add Employee') {
+    addEmployee()
   };
 
 })
@@ -186,33 +190,75 @@ async function addRole(){
 
   inquirer.prompt(answers)
   .then((data) => {
-    console.log(data);
-    db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.title, data.salary, data.selectedDepartment], function (err, results){
-      // console.log(results);
-          /*
-
-          ResultSetHeader {
-            fieldCount: 0,
-            affectedRows: 1,
-            insertId: 10,
-            info: '',
-            serverStatus: 2,
-            warningStatus: 0
-          }
-
-          */
-    });
+    // console.log(data); //* { title: 'Plumber', salary: '50000', selectedDepartment: 6 }
+    db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.title, data.salary, data.selectedDepartment], function (err, results){});
     console.log(`Added ${data.title} to roles`);
   })
   .catch(err => console.error(err));
 };
 
-// function that enables dynamic choice selection when trying to view employees by manager (not utilized)
+// function to allow call that allows users to add employees to database
+async function addEmployee(){
+
+  // const choiceOfManagers = [
+  //   {value: 1, first_name: 'Bruce'}, 
+  //   {value: 2, first_name: 'Mark'},
+  // ];
+
+  const answers = [
+    {
+      type: 'input',
+      name: 'first_name',
+      message: 'What is the first name of the employee?',
+    },
+    {
+      type: 'input',
+      name: 'last_name',
+      message: 'What is the last name of the employee?',
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: 'What is the role of the employee?',
+      choices: await getListOfRoles(),
+    },
+    {
+      type: 'list',
+      name: 'manager',
+      message: 'Which manager does the employee report to?',
+      choices: await getListofManagers(),
+    }
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    console.log(data);
+    db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [data.first_name, data.last_name, data.role, data.manager], function (err, results){});
+    console.log(`Added ${data.first_name} ${data.last_name} to database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function that enables dynamic choice selection when trying to view employees by manager
 function getListofManagers() {
   return new Promise((resolve, reject) => {
-    db.query('SELECT manager_id AS value, first_name FROM employee',function(err,data){
+    db.query('SELECT id AS value, first_name FROM employee',function(err,data){
       if(err) console.log(err)
-      console.log(data, 'line #178');
+      console.log(data);
+      /*
+
+      [
+        { value: 1, first_name: 'Bruce' },
+        { value: 2, first_name: 'Mark' },
+        { value: 3, first_name: 'Jim' },
+        { value: 4, first_name: 'Tom' },
+        { value: 5, first_name: 'Mickey' },
+        { value: 6, first_name: 'Justin' },
+        { value: 7, first_name: 'Uncle' },
+        { value: 8, first_name: 'Bob' }
+      ]
+
+      */
       resolve(data.map(row => ({ value: row.value, name: row.first_name })));
     })
   });
@@ -234,7 +280,25 @@ function getListOfRoles() {
   return new Promise((resolve, reject) => {
     db.query('SELECT id AS value, title FROM role',function(err,data){
       if(err) console.log(err)
-      // console.log(data); 
+      console.log(data); 
+      /*
+
+      [
+        { value: 1, title: 'Sales Lead' },
+        { value: 2, title: 'Salesperson' },
+        { value: 3, title: 'Lead Engineer' },
+        { value: 4, title: 'Software Engineer' },
+        { value: 5, title: 'Account Manager' },
+        { value: 6, title: 'Acountant' },
+        { value: 7, title: 'Legal Team Lead' },
+        { value: 8, title: 'Lawyer' },
+        { value: 9, title: 'Receptionist' },
+        { value: 10, title: 'Coordinator' },
+        { value: 11, title: 'CEO' },
+        { value: 12, title: 'Plumber' }
+      ]
+
+      */
       resolve(data.map(row => ({ value: row.value, name: row.title })));
     })
   });
