@@ -97,6 +97,10 @@ inquirer.prompt([
     addEmployee()
   };
 
+  if (selected === 'Update Employee Role') {
+    updateEmployeeRole()
+  };
+
 })
 
 .catch((error) => {
@@ -235,6 +239,34 @@ async function addEmployee(){
     console.log(data);
     db.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [data.first_name, data.last_name, data.role, data.manager], function (err, results){});
     console.log(`Added ${data.first_name} ${data.last_name} to database`);
+  })
+  .catch(err => console.error(err));
+};
+
+
+// function to allow call that allows users to update employees in database re role
+async function updateEmployeeRole(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'employee',
+      message: 'Which employee is being updated?',
+      choices: await getListOfEmployees(),
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: 'What is new role of the employee?',
+      choices: await getListOfRoles(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    db.query('UPDATE employee (first_name, role_id) VALUES (?, ?)', [data.employee, data.role], function (err, results){});
+    console.log(`Updated employee role in the database`);
   })
   .catch(err => console.error(err));
 };
