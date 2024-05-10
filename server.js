@@ -29,7 +29,7 @@ const choices = [
   "View Employees by Manager",
   "View Employees by Department",
   "Add Employee",
-  "Change Status of Employee as Manager",
+  "Update Employee Managers",
   "Update Employee Role",
   "View All Roles",
   "Add Role",
@@ -99,6 +99,10 @@ inquirer.prompt([
 
   if (selected === 'Update Employee Role') {
     updateEmployeeRole()
+  };
+
+  if (selected === 'Update Employee Managers') {
+    updateEmployeeManager()
   };
 
 })
@@ -264,9 +268,36 @@ async function updateEmployeeRole(){
 
   inquirer.prompt(answers)
   .then((data) => {
-    // console.log(data);
-    db.query('UPDATE employee (first_name, role_id) VALUES (?, ?)', [data.employee, data.role], function (err, results){});
+    console.log(data);
+    db.query(`UPDATE employee SET role_id = ${data.role} WHERE id = ${data.employee};`, function (err, results){});
     console.log(`Updated employee role in the database`);
+  })
+  .catch(err => console.error(err));
+};
+
+// function to allow call that allows users to update employees in database re manager
+async function updateEmployeeManager(){
+
+  const answers = [
+    {
+      type: 'list',
+      name: 'employee',
+      message: 'Which employee is being updated?',
+      choices: await getListOfEmployees(),
+    },
+    {
+      type: 'list',
+      name: 'manager',
+      message: 'Who is new manager of the employee?',
+      choices: await getListofManagers(),
+    },
+  ];
+
+  inquirer.prompt(answers)
+  .then((data) => {
+    // console.log(data);
+    db.query(`UPDATE employee SET manager_id = ${data.manager} WHERE id = ${data.employee};`, function (err, results){});
+    console.log(`Updated manager of employee in the database`);
   })
   .catch(err => console.error(err));
 };
