@@ -218,6 +218,28 @@ function getListofManagers() {
   });
 }
 
+// function that enables dynamic choice selection for list of current employees
+function getListOfEmployees() {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id AS value, first_name FROM employee',function(err,data){
+      if(err) console.log(err)
+      // console.log(data); 
+      resolve(data.map(row => ({ value: row.value, name: row.first_name })));
+    })
+  });
+}
+
+// function that enables dynamic choice selection for list of current roles
+function getListOfRoles() {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT id AS value, title FROM role',function(err,data){
+      if(err) console.log(err)
+      // console.log(data); 
+      resolve(data.map(row => ({ value: row.value, name: row.title })));
+    })
+  });
+}
+
 // function that enables dynamic choice selection when adding a role position to a department
 function getDepartmentChoices() {
   return new Promise((resolve, reject) => {
